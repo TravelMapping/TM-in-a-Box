@@ -1,26 +1,30 @@
 #!/bin/bash
 set -e
 
-# 1. Compile C++ siteupdate binaries
-echo "Compiling C++ siteupdate binaries..."
+# 1. Deploy/Update static web assets into /web/highways and /web/rail
+echo "=== Step 1: Deploying Web Assets ==="
+/app/install-web.sh
+
+# 2. Compile C++ siteupdate binaries
+echo "=== Step 2: Compiling C++ siteupdate binaries ==="
 cd /app/DataProcessing/siteupdate/cplusplus
 make siteupdate siteupdateST
 
-# 2. Wait for MySQL to become ready
-echo "Waiting for MySQL database host (db)..."
+# 3. Wait for MySQL to become ready
+echo "=== Step 3: Waiting for MySQL database host (db) ==="
 until mysqladmin ping -h"db" -u"travmap" -p"travmap_password" --silent; do
     sleep 2
 done
 
-# 3. Create initial databases
-echo "Ensuring MySQL databases exist..."
+# 4. Create initial databases
+echo "=== Step 4: Ensuring MySQL databases exist ==="
 mysql -h"db" -u"travmapadmin" -p"travmapadmin_password" -e "
     CREATE DATABASE IF NOT EXISTS TravelMapping;
     CREATE DATABASE IF NOT EXISTS TravelMappingRail;
 "
 
-# 4. TMHighways Update
-echo "Running siteupdate for TMHighways..."
+# 5. TMHighways Update
+echo "=== Step 5: Running siteupdate for TMHighways ==="
 cd /app/DataProcessing/siteupdate
 
 ./siteupdate.sh \
@@ -31,9 +35,9 @@ cd /app/DataProcessing/siteupdate
   --nographs \
   --numthreads 4
 
-# 5. Optional OSF Dataset Import (for HDX)
+# 6. Optional OSF Dataset Import (for HDX)
 if [ "$DOWNLOAD_OSF_DATA" = "true" ] && [ -d "/app/osf_data" ]; then
-    echo "Ingesting optional OSF SQL files into TravelMapping DB..."
+    echo "=== Step 6: Ingesting optional OSF SQL files into TravelMapping DB ==="
     for sql_file in /app/osf_data/*.sql; do
         [ -e "$sql_file" ] || continue
         echo "Importing $sql_file..."
@@ -41,8 +45,8 @@ if [ "$DOWNLOAD_OSF_DATA" = "true" ] && [ -d "/app/osf_data" ]; then
     done
 fi
 
-# 6. TMRail Update
-echo "Running siteupdate for TMRail..."
+# 7. TMRail Update
+echo "=== Step 7: Running siteupdate for TMRail ==="
 ./siteupdate.sh \
   --rail \
   --tmbasedir /app \
