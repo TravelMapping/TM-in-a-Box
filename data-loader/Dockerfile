@@ -5,12 +5,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install dependencies for C++ build, MySQL client, zip/unzip, and git
 RUN apt-get update && apt-get install -y \
     build-essential \
-    gmake \
+    clang \
+    make \
     git \
     wget \
     unzip \
     mysql-client \
     zip \
+    systemd \
+    libfmt-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

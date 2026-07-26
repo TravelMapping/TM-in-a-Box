@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # 1. Shared MySQL Container
   db:
@@ -7,11 +5,13 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: TravelMapping
-      MYSQL_USER: tm_user
-      MYSQL_PASSWORD: tm_password
+    command: 
+      - --innodb_redo_log_capacity=2147483648  # Increases Redo Log to 2GB (Default is 100MB)
+      - --innodb_flush_log_at_trx_commit=2     # Flushes log once per sec instead of per commit (huge bulk-import speedup)
+      - --sync_binlog=0                        # Disables OS disk syncing on binary log during writes 
     volumes:
-      - db_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
     healthcheck:
@@ -20,13 +20,15 @@ services:
       timeout: 5s
       retries: 10
 
-  # 2. C++ Ingestion Worker
+  # 2. C++ Ingestion Worker (Needs Read-Write / Admin)
   data-loader:
     build:
       context: ./data-loader
       dockerfile: Dockerfile
     environment:
-      DOWNLOAD_OSF_DATA: "false" # Set to "true" to process OSF zip/sql files
+      DOWNLOAD_OSF_DATA: "false"
+      TM_DB_USER: travmapadmin
+      TM_DB_PASS: travmapadmin_password
     volumes:
       - ./repos/DataProcessing:/app/DataProcessing
       - ./repos/HighwayData:/app/HighwayData
@@ -39,7 +41,7 @@ services:
       db:
         condition: service_healthy
 
-  # 3. TMHighways Server (Port 8080)
+  # 3. TMHighways Server (Read-Only)
   tmhighways:
     image: php:8.2-apache
     ports:
@@ -47,15 +49,15 @@ services:
     environment:
       TM_DB_NAME: TravelMapping
       TM_DB_HOST: db
-      TM_DB_USER: tm_user
-      TM_DB_PASS: tm_password
+      TM_DB_USER: travmap
+      TM_DB_PASS: travmap_password
     volumes:
       - ./repos/Web:/var/www/html
     depends_on:
       data-loader:
         condition: service_completed_successfully
 
-  # 4. TMRail Server (Port 8081)
+  # 4. TMRail Server (Read-Only)
   tmrail:
     image: php:8.2-apache
     ports:
@@ -63,15 +65,15 @@ services:
     environment:
       TM_DB_NAME: TravelMappingRail
       TM_DB_HOST: db
-      TM_DB_USER: tm_user
-      TM_DB_PASS: tm_password
+      TM_DB_USER: travmap
+      TM_DB_PASS: travmap_password
     volumes:
       - ./repos/Web:/var/www/html
     depends_on:
       data-loader:
         condition: service_completed_successfully
 
-  # 5. HDX Server (Port 8082)
+  # 5. HDX Server (Read-Only)
   hdx:
     image: php:8.2-apache
     ports:
@@ -79,8 +81,8 @@ services:
     environment:
       TM_DB_NAME: TravelMapping
       TM_DB_HOST: db
-      TM_DB_USER: tm_user
-      TM_DB_PASS: tm_password
+      TM_DB_USER: travmap
+      TM_DB_PASS: travmap_password
     volumes:
       - ./repos/Web:/var/www/html/web
       - ./repos/EduTools:/var/www/html/edutools
@@ -89,4 +91,5 @@ services:
         condition: service_completed_successfully
 
 volumes:
-  db_data:
+  mysql_data:
+

@@ -4,17 +4,17 @@ set -e
 # 1. Compile C++ siteupdate binaries
 echo "Compiling C++ siteupdate binaries..."
 cd /app/DataProcessing/siteupdate/cplusplus
-make -j4 siteupdate siteupdateST
+make siteupdate siteupdateST
 
 # 2. Wait for MySQL to become ready
 echo "Waiting for MySQL database host (db)..."
-until mysqladmin ping -h"db" -u"tm_user" -p"tm_password" --silent; do
+until mysqladmin ping -h"db" -u"travmap" -p"travmap_password" --silent; do
     sleep 2
 done
 
 # 3. Create initial databases
 echo "Ensuring MySQL databases exist..."
-mysql -h"db" -u"tm_user" -p"tm_password" -e "
+mysql -h"db" -u"travmapadmin" -p"travmapadmin_password" -e "
     CREATE DATABASE IF NOT EXISTS TravelMapping;
     CREATE DATABASE IF NOT EXISTS TravelMappingRail;
 "
@@ -28,6 +28,7 @@ cd /app/DataProcessing/siteupdate
   --webdir /web/highways \
   --nopull \
   --nodbcopy \
+  --nographs \
   --numthreads 4
 
 # 5. Optional OSF Dataset Import (for HDX)
