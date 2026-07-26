@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # 1. Shared MySQL Container
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: TravelMapping
+      MYSQL_USER: tm_user
+      MYSQL_PASSWORD: tm_password
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+  # 2. C++ Ingestion Worker
+  data-loader:
+    build:
+      context: ./data-loader
+      dockerfile: Dockerfile
+    environment:
+      DOWNLOAD_OSF_DATA: "false" # Set to "true" to process OSF zip/sql files
+    volumes:
+      - ./repos/DataProcessing:/app/DataProcessing
+      - ./repos/HighwayData:/app/HighwayData
+      - ./repos/UserData:/app/UserData
+      - ./repos/RailwayData:/app/RailwayData
+      - ./osf_data:/app/osf_data
+      - ./repos/Web:/web/highways
+      - ./repos/Web:/web/rail
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # 3. TMHighways Server (Port 8080)
+  tmhighways:
+    image: php:8.2-apache
+    ports:
+      - "8080:80"
+    environment:
+      TM_DB_NAME: TravelMapping
+      TM_DB_HOST: db
+      TM_DB_USER: tm_user
+      TM_DB_PASS: tm_password
+    volumes:
+      - ./repos/Web:/var/www/html
+    depends_on:
+      data-loader:
+        condition: service_completed_successfully
+
+  # 4. TMRail Server (Port 8081)
+  tmrail:
+    image: php:8.2-apache
+    ports:
+      - "8081:80"
+    environment:
+      TM_DB_NAME: TravelMappingRail
+      TM_DB_HOST: db
+      TM_DB_USER: tm_user
+      TM_DB_PASS: tm_password
+    volumes:
+      - ./repos/Web:/var/www/html
+    depends_on:
+      data-loader:
+        condition: service_completed_successfully
+
+  # 5. HDX Server (Port 8082)
+  hdx:
+    image: php:8.2-apache
+    ports:
+      - "8082:80"
+    environment:
+      TM_DB_NAME: TravelMapping
+      TM_DB_HOST: db
+      TM_DB_USER: tm_user
+      TM_DB_PASS: tm_password
+    volumes:
+      - ./repos/Web:/var/www/html/web
+      - ./repos/EduTools:/var/www/html/edutools
+    depends_on:
+      data-loader:
+        condition: service_completed_successfully
+
+volumes:
+  db_data:
