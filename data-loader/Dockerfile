@@ -22,8 +22,9 @@ WORKDIR /app
 COPY my.cnf /root/.my.cnf
 RUN chmod 600 /root/.my.cnf
 
-# Copy ingestion runner script
+# Copy ingestion runner scripts
 COPY run-updates.sh /app/run-updates.sh
-RUN chmod +x /app/run-updates.sh
+COPY install-web.sh /app/install-web.sh
+RUN chmod +x /app/run-updates.sh /app/install-web.sh
 
 ENTRYPOINT ["/app/run-updates.sh"]
