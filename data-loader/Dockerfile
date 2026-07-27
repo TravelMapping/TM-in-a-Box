@@ -27,4 +27,7 @@ COPY run-updates.sh /app/run-updates.sh
 COPY install-web.sh /app/install-web.sh
 RUN chmod +x /app/run-updates.sh /app/install-web.sh
 
+# Copy custom static web assets
+COPY leaflet-1.9.4 /app/leaflet-1.9.4
+
 ENTRYPOINT ["/app/run-updates.sh"]

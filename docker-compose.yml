@@ -10,6 +10,7 @@ services:
       - --innodb_redo_log_capacity=2147483648  # Increases Redo Log to 2GB (Default is 100MB)
       - --innodb_flush_log_at_trx_commit=2     # Flushes log once per sec instead of per commit (huge bulk-import speedup)
       - --sync_binlog=0                        # Disables OS disk syncing on binary log during writes 
+      - --sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION
     volumes:
       - mysql_data:/var/lib/mysql
       - ./db-init:/docker-entrypoint-initdb.d
@@ -45,7 +46,8 @@ services:
 
   # 3. TMHighways Server (Read-Only)
   tmhighways:
-    image: php:8.2-apache
+    build:
+      context: ./web-apache
     ports:
       - "8080:80"
     environment:
