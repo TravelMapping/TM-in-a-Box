@@ -28,27 +28,31 @@ The intended host system should have Docker installed, which would include WSL o
 
 1. Clone this repository into a directory on the host machine.  These instructions assume this is in a directory called `travelmapping` in the user's home directory.
 
-```cd ~/travelmapping
-git clone https://github.com/TravelMapping/TM-in-a-Box
-```
+   ```bash
+   cd ~/travelmapping
+   git clone https://github.com/TravelMapping/TM-in-a-Box
+   ```
 
 2. The directory `repos` at the top level of the cloned repository (`~/travelmapping/TM-in-a-Box/repos`) will be populated with all needed repositories from the GitHub Travel Mapping organization in a subsequent step.  Users who will be testing modifications or would otherwise like to have their own copies of any repository used should clone it/them now inside the `repos` directory.
 
 For example, a user with a GitHub account called "SomeTMUser" who has their own fork of the `UserData` repository who would like to test out changes to their list files would clone that at this time.
 
-```cd ~/travelmapping/TM-in-a-Box/repos
-git clone https://github.com/SomeTMUser/UserData
-```
+   ```bash
+   cd ~/travelmapping/TM-in-a-Box/repos
+   git clone https://github.com/SomeTMUser/UserData
+   ```
 
 3. Clone all other required TM repositories locally into `repos/`.
 
-   ```cd ~/travelmapping/TM-in-a-Box/repos
+   ```bash
+   cd ~/travelmapping/TM-in-a-Box/repos
    ./setup.sh
    ```
 
 4. Build and start the containers.
 
-   ```docker compose up --build
+   ```bash
+   docker compose up --build
    ```
    This process will take a few minutes.
    
@@ -63,23 +67,27 @@ Once the `docker compose` processes have completed, web servers are available to
 ## Testing Data Updates (`datacheck.sh`)
 
 To run a data check against local edits in the repositories in your `repos` directory:
-```docker compose run --rm data-loader /app/DataProcessing/siteupdate/datacheck.sh
-```
+   ```bash
+   docker compose run --rm data-loader /app/DataProcessing/siteupdate/datacheck.sh
+   ```
 
 ## Re-ingesting Data
 
 To re-compile `siteupdate` and re-populate the MySQL databases after data changes:
-```docker compose run --rm data-loader
-```
+   ```bash
+   docker compose run --rm data-loader
+   ```
 
 ## Installing changes to the web front end
 
 To install files that have been modified in the `Web` repository for testing on the server:
-```docker compose run --rm --entrypoint /app/install-web.sh data-loader
-```
+   ```bash
+   docker compose run --rm --entrypoint /app/install-web.sh data-loader
+   ```
 
 ## Shutting down
 
 To shut down all components:
-```docker compose down -v
-```
+   ```bash
+   docker compose down -v
+   ```
