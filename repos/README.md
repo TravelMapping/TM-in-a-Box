@@ -1,0 +1,1 @@
+This directory is where needed Travel Mapping GitHub repositories are cloned.
