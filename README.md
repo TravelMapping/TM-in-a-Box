@@ -35,15 +35,13 @@ The intended host system should have Docker installed, which would include WSL o
 
 2. The directory `repos` at the top level of the cloned repository (`~/travelmapping/TM-in-a-Box/repos`) will be populated with all needed repositories from the GitHub Travel Mapping organization in a subsequent step.  Users who will be testing modifications or would otherwise like to have their own copies of any repository used should clone it/them now inside the `repos` directory.
 
-For example, a user with a GitHub account called "SomeTMUser" who has their own fork of the `UserData` repository who would like to test out changes to their list files would clone that at this time.
-
+For example, a user with a GitHub account called "SomeTMUser" who has their own fork of the `UserData` repository who would like to test out changes to their list files would clone that at this time:
    ```bash
    cd ~/travelmapping/TM-in-a-Box/repos
    git clone https://github.com/SomeTMUser/UserData
    ```
 
-3. Clone all other required TM repositories locally into `repos/`.
-
+3. Clone all other required TM repositories locally into `repos`:
    ```bash
    cd ~/travelmapping/TM-in-a-Box/repos
    ./setup.sh
