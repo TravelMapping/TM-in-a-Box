@@ -22,18 +22,27 @@ This repository orchestrates the Travel Mapping (TM) infrastructure for the orig
 
 ## Prerequisites
 
-The intended host system should have Docker installed, which would include WSL on Windows machines.  These instructions assume you have the ability to run the `docker` command at an appropriate command-line terminal prompt on your system.
+The intended host system should have Docker installed, which would include WSL on Windows machines (where in Docker Desktop, under Settings>Resources>WSL integration, the box for "Enable integration with my default WSL distro" must be checked).
+
+These instructions assume you have the ability to run the `docker` command at an appropriate command-line terminal prompt on your system.
 
 ## Setup
 
-1. Clone this repository into a directory on the host machine.  These instructions assume this is in a directory called `travelmapping` in the user's home directory.
+These instructions assume installation into a directory called `travelmapping` in the user's home directory.
+
+1. If you don't already have such a directory, create it:
+   ```bash
+   mkdir ~/travelmapping
+   ```
+
+2. Clone this repository into a directory on the host machine.  
 
    ```bash
    cd ~/travelmapping
    git clone https://github.com/TravelMapping/TM-in-a-Box
    ```
 
-2. The directory `repos` at the top level of the cloned repository (`~/travelmapping/TM-in-a-Box/repos`) will be populated with all needed repositories from the GitHub Travel Mapping organization in a subsequent step.  Users who will be testing modifications or would otherwise like to have their own copies of any repository used should clone it/them now inside the `repos` directory.
+3. The directory `repos` at the top level of the cloned repository (`~/travelmapping/TM-in-a-Box/repos`) will be populated with all needed repositories from the GitHub Travel Mapping organization in a subsequent step.  Users who will be testing modifications or would otherwise like to have their own copies of any repository used should clone it/them now inside the `repos` directory.
 
 For example, a user with a GitHub account called "SomeTMUser" who has their own fork of the `UserData` repository who would like to test out changes to their list files would clone that at this time:
    ```bash
@@ -41,13 +50,13 @@ For example, a user with a GitHub account called "SomeTMUser" who has their own 
    git clone https://github.com/SomeTMUser/UserData
    ```
 
-3. Clone all other required TM repositories locally into `repos`:
+4. Clone all other required TM repositories locally into `repos`:
    ```bash
-   cd ~/travelmapping/TM-in-a-Box/repos
+   cd ~/travelmapping/TM-in-a-Box
    ./setup.sh
    ```
 
-4. Build and start the containers.
+5. Build and start the containers.
 
    ```bash
    docker compose up --build
