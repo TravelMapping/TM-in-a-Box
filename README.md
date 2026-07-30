@@ -2,7 +2,7 @@
 
 This repository orchestrates the Travel Mapping (TM) infrastructure for the original Highways, the Rail, and the METAL Highway Data Examiner (HDX) web servers using Docker Compose.  The resulting system will be a fully-functional version of these websites running entirely on the Docker host system.
 
-Note: initial development of this system has focused only on TM Highways.  TM Rail and HDX support will be added at a later time.
+> **Note:** initial development of this system has focused only on TM Highways.  TM Rail and HDX support will be added as time permits.
 
 ## Use Cases
 
@@ -85,7 +85,8 @@ To install files that have been modified in the `Web` repository for testing on 
 
 ## Shutting down
 
-To shut down all components:
+To shut down all components and delete the databases, ensuring a clean start when restarted:
    ```bash
    docker compose down -v
    ```
+You can omit the `-v` to keep the databases and speed up the restart process.
